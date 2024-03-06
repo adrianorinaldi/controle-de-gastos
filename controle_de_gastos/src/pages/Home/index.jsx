@@ -3,6 +3,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import './styles.css';
 import MenuLateral from '../../components/MenuLateral';
+import { Outlet } from 'react-router-dom';
 
 function Index() {
   return (
@@ -14,7 +15,9 @@ function Index() {
         <Col xs={3} md={3} className='menu-lateral'>
           <MenuLateral />
         </Col>
-        <Col>corpo</Col>
+        <Col className='corpo'>
+            <Outlet/>
+        </Col>
       </Row>
     </Container>
   );

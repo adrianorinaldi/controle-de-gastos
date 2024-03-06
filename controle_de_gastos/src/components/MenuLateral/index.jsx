@@ -1,14 +1,29 @@
 import Nav from 'react-bootstrap/Nav';
+import './styles.css';
 
 function MenuLateral() {
   return (
-    <Nav defaultActiveKey="/home" className="flex-column">
-      <Nav.Link href="/home">Active</Nav.Link>
-      <Nav.Link eventKey="link-1">Link</Nav.Link>
-      <Nav.Link eventKey="link-2">Link</Nav.Link>
-      <Nav.Link eventKey="disabled" disabled>
-        Disabled
-      </Nav.Link>
+    <Nav defaultActiveKey="inicio" className="flex-column">
+      <Nav.Item>
+        <Nav.Link eventKey="inicio" href="/home">
+            INICIO
+        </Nav.Link>
+      </Nav.Item>
+      <Nav.Item>
+        <Nav.Link eventKey="cadastros" disabled>
+            CADASTROS
+        </Nav.Link>
+      </Nav.Item>
+      <Nav.Item>
+        <Nav.Link eventKey="contas" href="/contas">
+            CONTAS
+        </Nav.Link>
+      </Nav.Item>
+      <Nav.Item>
+        <Nav.Link eventKey="categorias" href="/categorias">
+            CATEGORIAS
+        </Nav.Link>
+      </Nav.Item>
     </Nav>
   );
 }

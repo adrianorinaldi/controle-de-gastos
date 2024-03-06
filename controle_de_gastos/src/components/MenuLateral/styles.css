@@ -1,0 +1,14 @@
+.nav-link {
+    color: aliceblue;
+}
+
+.nav-item:hover {
+    background-color: rgb(237, 244, 245);
+}
+
+.flex-column {
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    background-color: aquamarine;
+}
