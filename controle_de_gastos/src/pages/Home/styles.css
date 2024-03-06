@@ -1,0 +1,17 @@
+.container {
+    background-color: rgb(179, 47, 47);
+}
+
+.row {
+    background-color: blue;
+}
+
+.cabecalho {
+    height: 20vh;
+    background-color: aqua;
+}
+
+.menu-lateral {
+    height: 80vh;
+    background-color: blueviolet;
+}
