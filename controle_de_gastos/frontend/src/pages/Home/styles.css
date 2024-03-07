@@ -1,0 +1,39 @@
+.cabecalho {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    height: 20vh;
+    background-color: rgb(194, 216, 216);
+}
+
+.linha-central {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    flex-direction: row;
+    height: 80vh;
+}
+
+.menu-lateral {
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    width: 20%;
+    height: 80vh;
+    background-color: rgb(19, 120, 167);
+}
+
+.corpo {
+    width: 80%;
+    height: 80vh;
+    background-color: rgb(253, 250, 250);
+}
+
+.nav-link {
+    color: aliceblue;
+}
+
+.nav-item:hover {
+    background-color: rgb(237, 244, 245);
+}
