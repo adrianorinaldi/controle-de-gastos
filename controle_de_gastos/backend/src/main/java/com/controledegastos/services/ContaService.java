@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ContaService {
@@ -25,6 +26,17 @@ public class ContaService {
 
     public List<Conta> buscarTodos() {
         return contaRepository.findAll();
+    }
+
+    public Boolean deletarConta(Long id) {
+        Optional<Conta> conta = contaRepository.findById(id);
+        System.out.println(conta);
+
+        if (!conta.isEmpty()) {
+            contaRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
 }

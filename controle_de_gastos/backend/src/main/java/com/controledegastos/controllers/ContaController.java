@@ -28,4 +28,9 @@ public class ContaController {
     public ResponseEntity<List<Conta>> buscarTodasContas() {
         return ResponseEntity.status(HttpStatus.OK).body(this.contaService.buscarTodos());
     }
+
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<Boolean> deletarConta(@PathVariable Long id) {
+        return ResponseEntity.ok(this.contaService.deletarConta(id));
+    }
 }
