@@ -19,7 +19,7 @@ function CadastroContas() {
 
       try {
 
-        const response = await axios.get('http://localhost:8080/conta/buscar_todas', formulario);
+        const response = await axios.get('http://localhost:8080/conta/buscar_todas');
 
         setDados(response.data);
 
@@ -69,6 +69,8 @@ function CadastroContas() {
           <Form onSubmit={salvarConta}>
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>Cadastro de Contas</Form.Label>
+              <br></br>
+              <Form.Label>Descrição</Form.Label>
               <Form.Control 
                 type="text" 
                 placeholder="Digite a descrição da conta..." 

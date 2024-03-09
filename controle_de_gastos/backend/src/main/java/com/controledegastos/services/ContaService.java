@@ -30,7 +30,6 @@ public class ContaService {
 
     public Boolean deletarConta(Long id) {
         Optional<Conta> conta = contaRepository.findById(id);
-        System.out.println(conta);
 
         if (!conta.isEmpty()) {
             contaRepository.deleteById(id);

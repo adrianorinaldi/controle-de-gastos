@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import Index from "./pages/Home"
 import CadastroContas from './components/Cadastros/Contas';
+import CadastroCategorias from './components/Cadastros/Categorias';
 
 const router = createBrowserRouter([
   {
@@ -12,7 +13,11 @@ const router = createBrowserRouter([
       {
       path: "/contas",
       element: <CadastroContas />
-      }
+      },
+      {
+        path: "/categorias",
+        element: <CadastroCategorias />
+        }
     ]
   },
 ]);
