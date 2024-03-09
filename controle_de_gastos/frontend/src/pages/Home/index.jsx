@@ -12,13 +12,18 @@ function Index() {
         <div className='menu-lateral'>
           <Nav defaultActiveKey="inicio" className="flex-column">
             <Nav.Item>
-              <Nav.Link eventKey="inicio" href="/">
+              <Nav.Link eventKey="inicio" href="/inicio">
                   INICIO
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link eventKey="cadastros" disabled>
-                  CADASTROS
+              <Nav.Link eventKey="inicio" href="/receitas">
+                  RECEITAS
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="inicio" href="/despesas">
+                  DESPESAS
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
