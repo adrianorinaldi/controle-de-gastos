@@ -25,7 +25,7 @@ public class ReceitaController {
     }
 
     @GetMapping({"/buscar_todas"})
-    public ResponseEntity<List<Receita>> buscarTodasReceitas() {
+    public ResponseEntity<List<ReceitaDTO>> buscarTodasReceitas() {
         return ResponseEntity.status(HttpStatus.OK).body(this.receitaService.buscarTodos());
     }
 

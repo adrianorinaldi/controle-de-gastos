@@ -2,7 +2,9 @@ package com.controledegastos.entities;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "receita")
@@ -17,10 +19,12 @@ public class Receita {
     @OneToOne
     private Categoria categoria;
 
-    private LocalDateTime data;
+    private Date data;
 
     @OneToOne
     private Conta conta;
+
+    private BigDecimal valor;
 
     public Long getId() {
         return id;
@@ -46,11 +50,11 @@ public class Receita {
         this.categoria = categoria;
     }
 
-    public LocalDateTime getData() {
+    public Date getData() {
         return data;
     }
 
-    public void setData(LocalDateTime data) {
+    public void setData(Date data) {
         this.data = data;
     }
 
@@ -60,5 +64,13 @@ public class Receita {
 
     public void setConta(Conta conta) {
         this.conta = conta;
+    }
+
+    public BigDecimal getValor() {
+        return valor;
+    }
+
+    public void setValor(BigDecimal valor) {
+        this.valor = valor;
     }
 }

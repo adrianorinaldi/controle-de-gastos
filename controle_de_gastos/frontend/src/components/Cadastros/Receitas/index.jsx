@@ -14,12 +14,15 @@ function Receitas () {
   const [mostrar, setMostrar] = useState(false);
   const fechar = () => setMostrar(false);
   const abrir = () => setMostrar(true);
-  const [dados, setDados] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+  const [contas, setContas] = useState([]);
+  const [receitas, setReceitas] = useState([]);
   const [formulario, setFormulario] = useState({
     valor: '',
     categoria: '',
     descricao: '',
-    data: ''
+    data: '',
+    conta: ''
   });
   const [dataSelecionada, setDataSelecionada] = useState(null);
     // Defina o idioma padrão para o DatePicker
@@ -38,17 +41,37 @@ function Receitas () {
     try {
 
       const response = await axios.get('http://localhost:8080/categoria/buscar_todas');
-      setDados(response.data);
+      setCategorias(response.data);
 
     } catch (error) {
       console.error('Erro:', error);
     }
   } 
 
-  const salvarConta = async (event) => {
+  const buscarContas = async (event) => {
+    try {
+
+      const response = await axios.get('http://localhost:8080/conta/buscar_todas');
+      setContas(response.data);
+
+    } catch (error) {
+      console.error('Erro:', error);
+    }
+  } 
+
+  const buscarTodasReceitas = async (event) => {
+    try {
+      const response = await axios.get('http://localhost:8080/receita/buscar_todas');
+      console.log(response.data);
+      setReceitas(response.data);
+    } catch (error) {
+      console.error('Erro:', error);
+    }
+  };
+
+  const salvarReceita = async (event) => {
     event.preventDefault();
 
-    console.log(formulario);
     setFormulario({ ...formulario, 'data': format(dataSelecionada, 'dd/MM/yyyy') });
     console.log(formulario);
 
@@ -57,7 +80,7 @@ function Receitas () {
 
       if (response.status === 201) {
         console.log('Conta Cadastrada com sucesso!');
-        buscarTodasContas();
+        buscarTodasReceitas();
       } else {
         console.error('Erro ao enviar os dados.' + response);
       }
@@ -84,15 +107,12 @@ function Receitas () {
       <hr></hr>
       <div className="quadro-receitas">
           <div>
-            <Button variant="primary" onClick={abrir}>
-              +
-            </Button>
             <Modal show={mostrar} onHide={fechar}>
               <Modal.Header closeButton>
                 <Modal.Title>ADICIONAR RECEITA</Modal.Title>
               </Modal.Header>
               <Modal.Body>
-                <Form onSubmit={salvarConta}>
+                <Form onSubmit={salvarReceita}>
                   <Form.Group className="mb-1">
                     <Form.Label>Valor</Form.Label>
                     <Form.Control 
@@ -110,10 +130,10 @@ function Receitas () {
                       value={formulario.categoria}
                       onChange={pegarValor}
                       >
-                      {dados.map((item) => (
+                      {categorias.map((item) => (
                         <option 
-                          key={item.descricao} 
-                          value={item.descricao}
+                          key={item.id} 
+                          value={item.id}
                           >
                             {item.descricao}
                         </option>
@@ -144,36 +164,71 @@ function Receitas () {
                       name="data"
                     />
                   </Form.Group>
+                  <Form.Group className="mb-1" onClick={buscarContas}>
+                    <Form.Label>Conta</Form.Label>
+                    <Form.Select 
+                      name="conta"
+                      value={formulario.conta}
+                      onChange={pegarValor}
+                      >
+                      {contas.map((item) => (
+                        <option 
+                          key={item.id} 
+                          value={item.id}
+                          >
+                            {item.descricao}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group>
                 </Form>
               </Modal.Body>
               <Modal.Footer>
                 <Button variant="secondary" onClick={fechar}>
                   CANCELAR
                 </Button>
-                <Button variant="primary" onClick={salvarConta}>
+                <Button variant="primary" onClick={salvarReceita}>
                   SALVAR
                 </Button>
               </Modal.Footer>
             </Modal>
           </div>
+          <div className='botoes'>
+              <Button variant="danger" href="/">
+                CANCELAR
+              </Button>
+              <Button variant="success" onClick={abrir}>
+                CADASTRAR
+              </Button>
+              <Button variant="info" onClick={buscarTodasReceitas}>
+                CARREGAR
+              </Button>
+            </div>
           <div className='tabela-receita'>
             <Table striped bordered hover>
               <thead>
                 <tr>
                   <th>dia</th>
                   <th>descrição</th>
+                  <th>categoria</th>
                   <th>valor</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>12</td>
-                  <td>Salário</td>
-                  <td>3.500,00</td>
-                  <td><Button>AL</Button></td>
-                  <td><Button variant='danger'>X</Button></td>
+              {receitas.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.data}</td>
+                  <td>{item.descricao}</td>
+                  <td>{item.categoria}</td>
+                  <td>{item.valor}</td>
+                  <td>
+                    <Button variant="danger" onClick={() => excluirConta(item.id)}>
+                      X
+                    </Button>
+                  </td>
                 </tr>
-              </tbody>
+                ))}
+            </tbody>
             </Table>
           </div>
         </div>
