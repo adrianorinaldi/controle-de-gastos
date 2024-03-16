@@ -1,6 +1,7 @@
 package com.controledegastos.controllers;
 
 import com.controledegastos.dtos.ReceitaDTO;
+import com.controledegastos.dtos.ReceitaDTOResponse;
 import com.controledegastos.entities.Receita;
 import com.controledegastos.services.ReceitaService;
 import jakarta.validation.Valid;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @CrossOrigin({"*"})
@@ -25,12 +27,17 @@ public class ReceitaController {
     }
 
     @GetMapping({"/buscar_todas"})
-    public ResponseEntity<List<ReceitaDTO>> buscarTodasReceitas() {
+    public ResponseEntity<List<ReceitaDTOResponse>> buscarTodasReceitas() {
         return ResponseEntity.status(HttpStatus.OK).body(this.receitaService.buscarTodos());
     }
 
     @DeleteMapping("/deletar/{id}")
     public ResponseEntity<Boolean> deletarReceita(@PathVariable Long id) {
         return ResponseEntity.ok(this.receitaService.deletarReceita(id));
+    }
+
+    @GetMapping({"/buscar_total_receita/{contaId}"})
+    public ResponseEntity<BigDecimal> buscarTotalReceita(@PathVariable Long contaId) {
+        return ResponseEntity.status(HttpStatus.OK).body(this.receitaService.buscarTotalReceita(contaId));
     }
 }

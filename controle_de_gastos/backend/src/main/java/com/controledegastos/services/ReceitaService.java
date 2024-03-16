@@ -1,6 +1,7 @@
 package com.controledegastos.services;
 
 import com.controledegastos.dtos.ReceitaDTO;
+import com.controledegastos.dtos.ReceitaDTOResponse;
 import com.controledegastos.entities.Categoria;
 import com.controledegastos.entities.Conta;
 import com.controledegastos.entities.Receita;
@@ -11,6 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -61,16 +63,16 @@ public class ReceitaService {
         return receitaDto;
     }
 
-    public List<ReceitaDTO> buscarTodos() {
-        List<ReceitaDTO> receitasDto = new ArrayList<>();
+    public List<ReceitaDTOResponse> buscarTodos() {
+        List<ReceitaDTOResponse> receitasDTOResponse = new ArrayList<>();
 
         for(Receita receita : receitaRepository.findAll()) {
-            ReceitaDTO receitaDto = new ReceitaDTO(receita.getDescricao(), receita.getCategoria().getId(),
-                                                   receita.getData().toString(), receita.getConta().getId(),
-                                                   receita.getValor());
-            receitasDto.add(receitaDto);
+            ReceitaDTOResponse receitaDTOResponse = new ReceitaDTOResponse(receita.getId(),receita.getDescricao(),
+                                                   receita.getCategoria().getDescricao(), receita.getData().toString(),
+                                                   receita.getConta().getDescricao(), receita.getValor());
+            receitasDTOResponse.add(receitaDTOResponse);
         }
-        return receitasDto;
+        return receitasDTOResponse;
     }
 
     public Boolean deletarReceita(Long id) {
@@ -81,6 +83,10 @@ public class ReceitaService {
             return true;
         }
         return false;
+    }
+
+    public BigDecimal buscarTotalReceita(Long contaId) {
+        return receitaRepository.buscarTotalReceita(contaId);
     }
 
 }

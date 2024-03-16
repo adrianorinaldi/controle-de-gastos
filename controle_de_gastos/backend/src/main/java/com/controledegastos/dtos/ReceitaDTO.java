@@ -8,7 +8,8 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record ReceitaDTO(@NotBlank String descricao,
+public record ReceitaDTO(Long id,
+                         @NotBlank String descricao,
                          @NotNull Long categoria,
                          @NotBlank String data,
                          @NotNull Long conta,
