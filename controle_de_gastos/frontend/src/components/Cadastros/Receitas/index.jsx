@@ -87,6 +87,7 @@ function Receitas () {
       const response = await axios.get('http://localhost:8080/receita/buscar_todas');
       console.log(response.data);
       setReceitas(response.data);
+      buscarTotalReceita();
     } catch (error) {
       console.error('Erro:', error);
     }
@@ -104,6 +105,7 @@ function Receitas () {
       if (response.status === 201) {
         console.log('Conta Cadastrada com sucesso!');
         buscarTodasReceitas();
+        fechar();
       } else {
         console.error('Erro ao enviar os dados.' + response);
       }
@@ -149,7 +151,7 @@ function Receitas () {
       <hr></hr>
       <div className="quadro-receitas">
           <div>
-            <Modal show={mostrar} onHide={fechar}>
+            <Modal scrollable="true" show={mostrar} onHide={fechar}>
               <Modal.Header closeButton>
                 <Modal.Title>ADICIONAR RECEITA</Modal.Title>
               </Modal.Header>
@@ -158,12 +160,13 @@ function Receitas () {
                   <Form.Group className="mb-1">
                     <Form.Label>Valor</Form.Label>
                     <Form.Control 
-                      required
                       type="number" 
                       placeholder="Digite o valor" 
                       name="valor"
                       value={formulario.valor}
                       onChange={pegarValor}
+                      className="campo-obrigatorio"
+                      required
                       />
                   </Form.Group>
                   <Form.Group className="mb-1" onClick={buscarCategorias}>
@@ -251,7 +254,7 @@ function Receitas () {
               </Button>
             </div>
           <div className='tabela-receita'>
-            <Table striped bordered hover>
+            <Table size="sm" striped bordered hover>
               <thead>
                 <tr>
                   <th>dia</th>
