@@ -85,8 +85,8 @@ public class ReceitaService {
         return false;
     }
 
-    public BigDecimal buscarTotalReceita(Long contaId) {
-        return receitaRepository.buscarTotalReceita(contaId);
+    public BigDecimal buscarTotalReceita() {
+        return receitaRepository.buscarTotalReceita();
     }
 
 }

@@ -48,11 +48,9 @@ function Receitas () {
     buscarTotalReceita();
   }, []);
 
-
   const buscarTotalReceita = async (event) => {
     try {
-      const contaId = 8;
-      const response = await axios.get(`http://localhost:8080/receita/buscar_total_receita/${contaId}`);
+      const response = await axios.get(`http://localhost:8080/receita/buscar_total_receita`);
       setTotalReceita(response.data);
 
     } catch (error) {
@@ -176,6 +174,8 @@ function Receitas () {
                       value={formulario.categoria}
                       onClick={pegarValor}
                       onChange={pegarValor}
+                      className="campo-obrigatorio"
+                      required
                       >
                       {categorias.map((item) => (
                         <option 
@@ -195,6 +195,8 @@ function Receitas () {
                       name="descricao"
                       value={formulario.descricao}
                       onChange={pegarValor}
+                      className="campo-obrigatorio"
+                      required
                       />
                   </Form.Group>
                   <Form.Group>
@@ -208,8 +210,9 @@ function Receitas () {
                       selected={dataSelecionada}
                       onChange={pegarValorDeData}
                       dateFormat="dd/MM/yyyy" 
-                      className="form-control" 
+                      className="form-control campo-obrigatorio" 
                       name="data"
+                      required
                     />
                   </Form.Group>
                   <Form.Group className="mb-1" onClick={buscarContas}>

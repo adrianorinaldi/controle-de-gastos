@@ -36,8 +36,8 @@ public class ReceitaController {
         return ResponseEntity.ok(this.receitaService.deletarReceita(id));
     }
 
-    @GetMapping({"/buscar_total_receita/{contaId}"})
-    public ResponseEntity<BigDecimal> buscarTotalReceita(@PathVariable Long contaId) {
-        return ResponseEntity.status(HttpStatus.OK).body(this.receitaService.buscarTotalReceita(contaId));
+    @GetMapping({"/buscar_total_receita"})
+    public ResponseEntity<BigDecimal> buscarTotalReceita() {
+        return ResponseEntity.status(HttpStatus.OK).body(this.receitaService.buscarTotalReceita());
     }
 }

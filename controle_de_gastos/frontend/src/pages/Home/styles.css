@@ -34,6 +34,10 @@
     color: aliceblue;
 }
 
+.nav-dropdown {
+    color: aliceblue;
+}
+
 .nav-item:hover {
     background-color: rgb(237, 244, 245);
 }

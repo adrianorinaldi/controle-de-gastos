@@ -1,4 +1,4 @@
-import Nav from 'react-bootstrap/Nav';
+import { Nav } from 'react-bootstrap';
 import './styles.css';
 import { Outlet } from 'react-router-dom';
 

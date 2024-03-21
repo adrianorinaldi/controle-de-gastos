@@ -16,12 +16,14 @@ public class Receita {
 
     private String descricao;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "categoria_id")
     private Categoria categoria;
 
     private Date data;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "conta_id")
     private Conta conta;
 
     private BigDecimal valor;

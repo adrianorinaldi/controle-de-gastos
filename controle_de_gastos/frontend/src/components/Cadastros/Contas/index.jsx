@@ -5,8 +5,8 @@ import axios from 'axios';
 
 function CadastroContas() {
   const [dados, setDados] = useState([]);
-
-    const [formulario, setFormulario] = useState({
+  
+  const [formulario, setFormulario] = useState({
       descricao: ''
     });
   
