@@ -1,6 +1,6 @@
 import { Form, Button, Table } from 'react-bootstrap';
 import './styles.css';
-import React, { useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import axios from 'axios';
 
 function Categorias() {
@@ -10,6 +10,10 @@ function Categorias() {
     descricao: '',
     tipo: 'R'
   });
+
+  useEffect(() => {
+    buscarTodasCategorias();
+  }, []);
 
   const pegarValor = (event) => {
     const { name, value } = event.target;
@@ -38,6 +42,7 @@ function Categorias() {
       if (response.status === 201) {
         console.log('Categoria Cadastrada com sucesso!');
         buscarTodasCategorias();
+        
       } else {
         console.error('Erro ao enviar os dados.' + response);
       }
@@ -107,9 +112,6 @@ function Categorias() {
               </Button>
               <Button variant="success" type="submit">
                 CADASTRAR
-              </Button>
-              <Button variant="info" onClick={buscarTodasCategorias}>
-                CARREGAR
               </Button>
             </div>
           </Form>

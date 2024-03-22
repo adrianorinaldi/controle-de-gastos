@@ -33,4 +33,9 @@ public class ContaController {
     public ResponseEntity<Boolean> deletarConta(@PathVariable Long id) {
         return ResponseEntity.ok(this.contaService.deletarConta(id));
     }
+
+    @PostMapping({"/alterar"})
+    public ResponseEntity<Boolean> alterarConta(@RequestBody @Valid ContaDTO contaDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.contaService.alterarConta(contaDto));
+    }
 }

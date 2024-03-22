@@ -5,6 +5,7 @@ import com.controledegastos.entities.Conta;
 import com.controledegastos.repositories.ContaRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,7 +26,8 @@ public class ContaService {
     }
 
     public List<Conta> buscarTodos() {
-        return contaRepository.findAll();
+        Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+        return contaRepository.findAll(sortById);
     }
 
     public Boolean deletarConta(Long id) {
@@ -36,6 +38,13 @@ public class ContaService {
             return true;
         }
         return false;
+    }
+
+    public Boolean alterarConta(ContaDTO contaDto) {
+        Conta conta = new Conta();
+        BeanUtils.copyProperties(contaDto, conta);
+        contaRepository.save(conta);
+        return true;
     }
 
 }
