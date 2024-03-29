@@ -10,13 +10,13 @@ import { format } from 'date-fns';
 // Registre o idioma para que o DatePicker o utilize
 registerLocale('pt-BR', ptBR);
 
-function Receitas () {
+function despesas () {
   const [mostrar, setMostrar] = useState(false);
   const fechar = () => setMostrar(false);
-  const [totalReceita, setTotalReceita] = useState([]);
+  const [totalDespesa, setTotalDespesa] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [contas, setContas] = useState([]);
-  const [receitas, setReceitas] = useState([]);
+  const [despesas, setDespesas] = useState([]);
   const [formulario, setFormulario] = useState({
     valor: '',
     categoria: '',
@@ -49,14 +49,14 @@ function Receitas () {
   };
 
   useEffect(() => {
-    buscarTotalReceita();
-    buscarTodasReceitas();
+    buscarTotalDespesa();
+    buscarTodasDespesas();
   }, []);
 
-  const buscarTotalReceita = async (event) => {
+  const buscarTotalDespesa = async (event) => {
     try {
-      const response = await axios.get(`http://localhost:8080/receita/buscar_total_receita`);
-      setTotalReceita(response.data);
+      const response = await axios.get(`http://localhost:8080/despesa/buscar_total_despesa`);
+      setTotalDespesa(response.data);
 
     } catch (error) {
       console.error('Erro:', error);
@@ -66,7 +66,7 @@ function Receitas () {
   const buscarCategorias = async (event) => {
     try {
 
-      const response = await axios.get('http://localhost:8080/categoria/buscar_categoria_receitas');
+      const response = await axios.get('http://localhost:8080/categoria/buscar_categoria_despesas');
       setCategorias(response.data);
 
     } catch (error) {
@@ -85,29 +85,29 @@ function Receitas () {
     }
   } 
 
-  const buscarTodasReceitas = async (event) => {
+  const buscarTodasDespesas = async (event) => {
     try {
-      const response = await axios.get('http://localhost:8080/receita/buscar_todas');
+      const response = await axios.get('http://localhost:8080/despesa/buscar_todas');
       console.log(response.data);
-      setReceitas(response.data);
-      buscarTotalReceita();
+      setDespesas(response.data);
+      buscarTotalDespesa();
     } catch (error) {
       console.error('Erro:', error);
     }
   };
 
-  const salvarReceita = async (event) => {
+  const salvarDespesa = async (event) => {
     event.preventDefault();
 
     //setFormulario({ ...formulario, 'data': format(dataSelecionada, 'dd/MM/yyyy') });
     console.log(formulario);
 
     try {
-      const response = await axios.post('http://localhost:8080/receita/salvar', formulario);
+      const response = await axios.post('http://localhost:8080/despesa/salvar', formulario);
 
       if (response.status === 201) {
         console.log('Conta Cadastrada com sucesso!');
-        buscarTodasReceitas();
+        buscarTodasDespesas();
         fechar();
       } else {
         console.error('Erro ao enviar os dados.' + response);
@@ -117,16 +117,16 @@ function Receitas () {
     }
   };
 
-  const excluirReceita = async (id) => {
+  const excluirDespesa = async (id) => {
         
     console.log("depois="+id);
 
       try {
-        const response = await axios.delete(`http://localhost:8080/receita/deletar/${id}`);
+        const response = await axios.delete(`http://localhost:8080/despesa/deletar/${id}`);
 
         if(response) {
           console.log("excluiu");
-          buscarTodasReceitas();
+          buscarTodasDespesas();
         } else {
           console.log("Não excluiu");
         }
@@ -138,28 +138,28 @@ function Receitas () {
   
   return (
     <div>
-      <div className='receitas'>
+      <div className='despesas'>
         <div>
-          <Form.Label htmlFor="receitas">RECEITAS</Form.Label>
+          <Form.Label htmlFor="despesas">despesas</Form.Label>
         </div>
         <div>
           <Form.Control
             type="text"
-            id="receitas"
+            id="despesas"
             aria-describedby="passwordHelpBlock"
-            defaultValue={totalReceita.toLocaleString('pt-BR')}
+            defaultValue={totalDespesa.toLocaleString('pt-BR')}
           />
         </div>
       </div>
       <hr></hr>
-      <div className="quadro-receitas">
+      <div className="quadro-despesas">
           <div>
             <Modal scrollable="true" show={mostrar} onHide={fechar}>
               <Modal.Header closeButton>
-                <Modal.Title>ADICIONAR RECEITA</Modal.Title>
+                <Modal.Title>ADICIONAR DESPESA</Modal.Title>
               </Modal.Header>
               <Modal.Body>
-                <Form onSubmit={salvarReceita}>
+                <Form onSubmit={salvarDespesa}>
                   <Form.Group className="mb-1">
                     <Form.Label>Valor</Form.Label>
                     <Form.Control 
@@ -244,7 +244,7 @@ function Receitas () {
                 <Button variant="secondary" onClick={fechar}>
                   CANCELAR
                 </Button>
-                <Button variant="primary" onClick={salvarReceita}>
+                <Button variant="primary" onClick={salvarDespesa}>
                   SALVAR
                 </Button>
               </Modal.Footer>
@@ -258,7 +258,7 @@ function Receitas () {
                 CADASTRAR
               </Button>
             </div>
-          <div className='tabela-receitas'>
+          <div className='tabela-despesas'>
             <Table size="sm" striped bordered hover>
               <thead>
                 <tr>
@@ -269,14 +269,14 @@ function Receitas () {
                 </tr>
               </thead>
               <tbody>
-              {receitas.map((item) => (
+              {despesas.map((item) => (
                 <tr key={item.id}>
                   <td>{format(item.data, 'dd/MM/yyyy')}</td>
                   <td>{item.descricao}</td>
                   <td>{item.categoria}</td>
                   <td>{item.valor.toLocaleString('pt-BR')}</td>
                   <td>
-                    <Button variant="danger" onClick={() => excluirReceita(item.id)}>
+                    <Button variant="danger" onClick={() => excluirDespesa(item.id)}>
                       X
                     </Button>
                   </td>
@@ -290,4 +290,4 @@ function Receitas () {
   );
 }
 
-export default Receitas;
+export default despesas;

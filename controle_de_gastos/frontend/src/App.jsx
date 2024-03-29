@@ -6,6 +6,7 @@ import CadastroContas from './components/Cadastros/Contas';
 import CadastroCategorias from './components/Cadastros/Categorias';
 import Inicio from './components/Inicio';
 import Receitas from './components/Cadastros/Receitas';
+import Despesas from './components/Cadastros/Despesas';
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: "/receitas",
         element: <Receitas />
+      },
+      {
+        path: "/despesas",
+        element: <Despesas />
       }
     ]
   },

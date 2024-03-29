@@ -3,15 +3,12 @@ import './styles.css';
 import { React, useState, useEffect } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPen } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 function CadastroContas() {
   const [dados, setDados] = useState([]);
-  const [botaoAlterar, setBotaoAlterar] = useState(false);
-  const [botaoCadastrar, setBotaoCadastrar] = useState(true);
   const [mostrar, setMostrar] = useState(false);
   const fechar = () => setMostrar(false);
-  const abrir = () => setMostrar(true);
   
   const [formulario, setFormulario] = useState({
       id: '',
@@ -74,14 +71,18 @@ function CadastroContas() {
         }
     };
 
-    const alterarConta = (idConta, descricaoConta) => {
-      setFormulario({ ...formulario, 'id': idConta, 'descricao': descricaoConta });
-      setBotaoAlterar(!botaoAlterar);
-      setBotaoCadastrar(!botaoCadastrar);
+    const abrirTelaAlterarConta = (idConta) => {
+      setMostrar(true);
+      setFormulario({ ...formulario, 'id': idConta});
+    };
+
+    const alterarConta = () => {
+      salvarAlteracaoConta();
+      setMostrar(false);
     };
 
     const salvarAlteracaoConta = async (event) => {
-      event.preventDefault();
+      //event.preventDefault();
 
       console.log(formulario);
   
@@ -120,13 +121,13 @@ function CadastroContas() {
               <Button variant="danger" href="/">
                 CANCELAR
               </Button>
-              <Button variant="success" type="submit" disabled={!botaoCadastrar}>
+              <Button variant="success" type="submit">
                 CADASTRAR
               </Button>
             </div>
           </Form>
         </div>
-        <div>
+        <div className='tabela-conta'>
           <Table striped bordered hover>
             <thead>
               <tr>
@@ -141,9 +142,9 @@ function CadastroContas() {
                   <td>{item.descricao}</td>
                   <td>
                     <Button variant="danger" onClick={() => excluirConta(item.id)}>
-                      X
+                      <FontAwesomeIcon icon={faTrash} />
                     </Button>
-                    <Button variant="info" onClick={abrir}>
+                    <Button variant="info" onClick={() => abrirTelaAlterarConta(item.id)}>
                       <FontAwesomeIcon icon={faPen} />
                     </Button>
                   </td>
@@ -160,15 +161,13 @@ function CadastroContas() {
             <Modal.Body>
               <Form>
                 <Form.Group className="mb-1">
-                  <Form.Label>Valor</Form.Label>
+                  <Form.Label>Nova Descrição</Form.Label>
                   <Form.Control 
-                    type="number" 
-                    placeholder="Digite o valor" 
-                    name="valor"
-                    value={formulario.valor}
-                    //onChange={pegarValor}
-                    className="campo-obrigatorio"
-                    required
+                    type="text" 
+                    placeholder="Digite a nova descrição da conta..." 
+                    name="descricao"
+                    value={formulario.descricao}
+                    onChange={pegarValor}
                     />
                 </Form.Group>
               </Form>

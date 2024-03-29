@@ -11,9 +11,6 @@ import java.math.BigDecimal;
 @Repository
 public interface ReceitaRepository extends JpaRepository<Receita, Long> {
 
-    /*@Query("SELECT sum(valor) FROM receita WHERE conta_id = :conta_id")
-    Double buscarTotalReceita(@Param("conta_id") Long contaId);*/
-
     @Query("SELECT sum(receita.valor) FROM Receita receita")
     BigDecimal buscarTotalReceita();
 }

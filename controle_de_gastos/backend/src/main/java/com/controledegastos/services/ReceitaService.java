@@ -10,6 +10,7 @@ import com.controledegastos.repositories.ContaRepository;
 import com.controledegastos.repositories.ReceitaRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -64,9 +65,10 @@ public class ReceitaService {
     }
 
     public List<ReceitaDTOResponse> buscarTodos() {
+        Sort sortById = Sort.by(Sort.Direction.DESC, "data");
         List<ReceitaDTOResponse> receitasDTOResponse = new ArrayList<>();
 
-        for(Receita receita : receitaRepository.findAll()) {
+        for(Receita receita : receitaRepository.findAll(sortById)) {
             ReceitaDTOResponse receitaDTOResponse = new ReceitaDTOResponse(receita.getId(),receita.getDescricao(),
                                                    receita.getCategoria().getDescricao(), receita.getData().toString(),
                                                    receita.getConta().getDescricao(), receita.getValor());

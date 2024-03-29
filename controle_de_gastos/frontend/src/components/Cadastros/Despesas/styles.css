@@ -1,11 +1,11 @@
-.receitas {
+.despesas {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.tabela-receitas {
+.tabela-despesas {
   overflow-y: auto;
   max-height: 50vh;
 }

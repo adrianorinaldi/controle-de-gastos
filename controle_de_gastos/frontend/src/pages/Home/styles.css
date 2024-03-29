@@ -12,7 +12,8 @@
     justify-content: start;
     align-items: center;
     flex-direction: row;
-    height: 80vh;
+    height: 100vh;
+    background-color: rgb(31, 167, 19);
 }
 
 .menu-lateral {
@@ -20,13 +21,13 @@
     justify-content: start;
     align-items: start;
     width: 20%;
-    height: 80vh;
+    height: 100%;
     background-color: rgb(19, 120, 167);
 }
 
 .corpo {
     width: 80%;
-    height: 80vh;
+    height: 100vh;
     background-color: rgb(253, 250, 250);
 }
 

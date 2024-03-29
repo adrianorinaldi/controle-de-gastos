@@ -7,6 +7,7 @@ import com.controledegastos.entities.Conta;
 import com.controledegastos.repositories.CategoriaRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,7 +27,16 @@ public class CategoriaService {
     }
 
     public List<Categoria> buscarTodos() {
-        return categoriaRepository.findAll();
+        Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+        return categoriaRepository.findAll(sortById);
+    }
+
+    public List<Categoria> buscarCategoriaReceitas() {
+        return categoriaRepository.buscarCategoriaReceitas();
+    }
+
+    public List<Categoria> buscarCategoriaDespesas() {
+        return categoriaRepository.buscarCategoriaDespesas();
     }
 
     public Boolean deletarCategoria(Long id) {
@@ -38,4 +48,12 @@ public class CategoriaService {
         }
         return false;
     }
+
+    public Boolean alterarCategoria(CategoriaDTO categoriaDto) {
+        Categoria categoria = new Categoria();
+        BeanUtils.copyProperties(categoriaDto, categoria);
+        categoriaRepository.save(categoria);
+        return true;
+    }
+
 }

@@ -1,12 +1,16 @@
-import { Form, Button, Table } from 'react-bootstrap';
+import { Form, Button, Table, Modal } from 'react-bootstrap';
 import './styles.css';
 import { React, useState, useEffect } from 'react';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 function Categorias() {
-
+  const [mostrar, setMostrar] = useState(false);
+  const fechar = () => setMostrar(false);
   const [dados, setDados] = useState([]);
   const [formulario, setFormulario] = useState({
+    id: '',
     descricao: '',
     tipo: 'R'
   });
@@ -67,6 +71,36 @@ function Categorias() {
       }
   };
 
+  const salvarAlteracaoCategoria = async (event) => {
+    //event.preventDefault();
+
+    console.log(formulario);
+
+    try {
+      const response = await axios.post('http://localhost:8080/categoria/alterar', formulario);
+
+      if (response.status === 201) {
+        console.log('Conta Alterada com sucesso!');
+        formulario.descricao = '';
+        buscarTodasCategorias();
+      } else {
+        console.error('Erro ao enviar os dados.' + response);
+      }
+    } catch (error) {
+      console.error('Erro:', error);
+    }
+  };
+
+  const abrirTelaAlterarCategoria = (idCategoria, descricaoCategoria, tipoCategoria) => {
+    setMostrar(true);
+    setFormulario({ ...formulario, 'id': idCategoria, 'descricao': descricaoCategoria, 'tipo': tipoCategoria});
+  };
+
+  const alterarCategoria = () => {
+    salvarAlteracaoCategoria();
+    setMostrar(false);
+  };
+
   return (
       <div>
         <div>
@@ -116,7 +150,7 @@ function Categorias() {
             </div>
           </Form>
         </div>
-        <div>
+        <div className='tabela-categoria'>
           <Table striped bordered hover>
             <thead>
               <tr>
@@ -133,13 +167,70 @@ function Categorias() {
                   <td>{item.tipo == 'R' ? 'Receita' : 'Despesa'}</td>
                   <td>
                     <Button variant="danger" onClick={() => excluirCategoria(item.id)}>
-                      X
+                      <FontAwesomeIcon icon={faTrash} />
+                    </Button>
+                    <Button variant="info" onClick={() => abrirTelaAlterarCategoria(item.id, item.descricao, item.tipo)}>
+                      <FontAwesomeIcon icon={faPen} />
                     </Button>
                   </td>
                 </tr>
                 ))}
             </tbody>
           </Table>
+        </div>
+        <div>
+          <Modal scrollable="true" show={mostrar} onHide={fechar}>
+            <Modal.Header closeButton>
+              <Modal.Title>ALTERAR CATEGORIA</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form>
+                <Form.Group className="mb-1">
+                  <Form.Label>Nova Categoria</Form.Label>
+                  <Form.Label>Tipo</Form.Label>
+                  <div>
+                    <Form.Check 
+                      inline
+                      type="radio" 
+                      label="Receita" 
+                      id="R"
+                      name="tipo"
+                      value="R"
+                      onChange={pegarValor}
+                      checked={formulario.tipo == 'R' ? true : false}
+                      />
+                    <Form.Check 
+                      inline
+                      type="radio" 
+                      label="Despesa" 
+                      id="D"
+                      name="tipo"
+                      value="D"
+                      onChange={pegarValor}
+                      checked={formulario.tipo == 'D' ? true : false}
+                      />
+                  </div>
+                  <br></br>
+                  <Form.Label>Descrição</Form.Label>
+                  <Form.Control 
+                    type="text" 
+                    placeholder="Digite a descrição da categoria..." 
+                    name="descricao"
+                    value={formulario.descricao}
+                    onChange={pegarValor}
+                    />
+                </Form.Group>
+              </Form>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={fechar}>
+                CANCELAR
+              </Button>
+              <Button variant="primary" onClick={alterarCategoria}>
+                ALTERAR
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </div>
       </div>
   );

@@ -2,3 +2,8 @@
   display: flex;
   justify-content: space-around;
 }
+
+.tabela-conta {
+  overflow-y: auto;
+  max-height: 50vh;
+}
