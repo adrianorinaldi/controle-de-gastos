@@ -2,6 +2,8 @@ import { Button, Form, Table, Modal } from "react-bootstrap";
 import "./styles.css";
 import { React, useState, useEffect } from 'react';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { registerLocale, setDefaultLocale } from 'react-datepicker';
@@ -11,13 +13,16 @@ import { format } from 'date-fns';
 registerLocale('pt-BR', ptBR);
 
 function Receitas () {
-  const [mostrar, setMostrar] = useState(false);
-  const fechar = () => setMostrar(false);
+  const [mostrarModalCadastro, setMostrarModalCadastro] = useState(false);
+  const fecharModalCadastro = () => setMostrarModalCadastro(false);
+  const [mostrarModalAlterar, setMostrarModalAlterar] = useState(false);
+  const fecharModalAlterar = () => setMostrarModalAlterar(false);
   const [totalReceita, setTotalReceita] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [contas, setContas] = useState([]);
   const [receitas, setReceitas] = useState([]);
   const [formulario, setFormulario] = useState({
+    id: '',
     valor: '',
     categoria: '',
     descricao: '',
@@ -35,12 +40,13 @@ function Receitas () {
 
   const abrirModalCadastrar = () => {
     setFormulario({ ...formulario, 'valor': '', 'descricao': '', 'data': ''});
-    setMostrar(true);
+    setMostrarModalCadastro(true);
   };
 
   const pegarValor = async (event) => {
     const { name, value } = event.target;
     setFormulario({ ...formulario, [name]: value });
+    console.log({...formulario});
   };
 
   const pegarValorDeData = (date) => {
@@ -51,6 +57,8 @@ function Receitas () {
   useEffect(() => {
     buscarTotalReceita();
     buscarTodasReceitas();
+    buscarCategorias();
+    buscarContas();
   }, []);
 
   const buscarTotalReceita = async (event) => {
@@ -96,10 +104,19 @@ function Receitas () {
     }
   };
 
+  const abrirTelaAlterarReceita = (idReceita, valorReceita, descricaoReceita, dataReceita) => {
+    setMostrarModalAlterar(true);
+    setDataSelecionada(dataReceita);
+    setFormulario({ ...formulario, 'id': idReceita, 
+                                   'valor': valorReceita, 
+                                   'descricao': descricaoReceita,
+                                   'data': format(dataReceita, 'dd/MM/yyyy')
+                                  });
+  };
+
   const salvarReceita = async (event) => {
     event.preventDefault();
 
-    //setFormulario({ ...formulario, 'data': format(dataSelecionada, 'dd/MM/yyyy') });
     console.log(formulario);
 
     try {
@@ -108,7 +125,7 @@ function Receitas () {
       if (response.status === 201) {
         console.log('Conta Cadastrada com sucesso!');
         buscarTodasReceitas();
-        fechar();
+        fecharModalCadastro();
       } else {
         console.error('Erro ao enviar os dados.' + response);
       }
@@ -135,6 +152,30 @@ function Receitas () {
       }
   };
 
+  const alterarReceita = () => {
+    salvarAlteracaoReceita();
+    setMostrarModalAlterar(false);
+  };
+
+  const salvarAlteracaoReceita = async (event) => {
+
+    console.log(formulario);
+
+    try {
+      const response = await axios.post('http://localhost:8080/receita/salvar', formulario);
+
+      if (response.status === 201) {
+        console.log('Conta Alterada com sucesso!');
+        formulario.descricao = '';
+        buscarTodasReceitas();
+      } else {
+        console.error('Erro ao enviar os dados.' + response);
+      }
+    } catch (error) {
+      console.error('Erro:', error);
+    }
+  };
+
   
   return (
     <div>
@@ -154,13 +195,149 @@ function Receitas () {
       <hr></hr>
       <div className="quadro-receitas">
           <div>
-            <Modal scrollable="true" show={mostrar} onHide={fechar}>
+            <Modal scrollable="true" show={mostrarModalCadastro} onHide={fecharModalCadastro}>
               <Modal.Header closeButton>
                 <Modal.Title>ADICIONAR RECEITA</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <Form onSubmit={salvarReceita}>
                   <Form.Group className="mb-1">
+                    <Form.Label>Valor</Form.Label>
+                    <Form.Control 
+                      type="number" 
+                      placeholder="Digite o valor" 
+                      name="valor"
+                      value={formulario.valor}
+                      onChange={pegarValor}
+                      className="campo-obrigatorio"
+                      required
+                      />
+                  </Form.Group>
+                  <Form.Group className="mb-1" onClick={buscarCategorias}>
+                    <Form.Label>Categoria</Form.Label>
+                    <Form.Select 
+                      name="categoria"
+                      value={formulario.categoria}
+                      onClick={pegarValor}
+                      onChange={pegarValor}
+                      className="campo-obrigatorio"
+                      required
+                      >
+                      {categorias.map((item) => (
+                        <option
+                          key={item.id}
+                          value={item.id}
+                          >
+                            {item.descricao}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group>
+                  <Form.Group className="mb-1">
+                    <Form.Label>Descrição</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      placeholder="Digite a descrição" 
+                      name="descricao"
+                      value={formulario.descricao}
+                      onChange={pegarValor}
+                      className="campo-obrigatorio"
+                      required
+                      />
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Label>Data</Form.Label>
+                    <br></br>
+                    <DatePicker
+                      showIcon
+                      toggleCalendarOnIconClick
+                      locale="pt-BR"
+                      //defaultValue={data_atual}
+                      selected={dataSelecionada}
+                      onChange={pegarValorDeData}
+                      dateFormat="dd/MM/yyyy" 
+                      className="form-control campo-obrigatorio" 
+                      name="data"
+                      required
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-1" onClick={buscarContas}>
+                    <Form.Label>Conta</Form.Label>
+                    <Form.Select 
+                      name="conta"
+                      value={formulario.conta}
+                      onClick={pegarValor}
+                      onChange={pegarValor}
+                      >
+                      {contas.map((item) => (
+                        <option 
+                          key={item.id}
+                          value={item.id}
+                          >
+                            {item.descricao}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group>
+                </Form>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={fecharModalCadastro}>
+                  CANCELAR
+                </Button>
+                <Button variant="primary" onClick={salvarReceita}>
+                  SALVAR
+                </Button>
+              </Modal.Footer>
+            </Modal>
+          </div>
+          <div className='botoes'>
+              <Button variant="danger" href="/">
+                CANCELAR
+              </Button>
+              <Button variant="success" onClick={abrirModalCadastrar}>
+                CADASTRAR
+              </Button>
+            </div>
+          <div className='tabela-receitas'>
+            <Table size="sm" striped bordered hover>
+              <thead>
+                <tr>
+                  <th>dia</th>
+                  <th>descrição</th>
+                  <th>categoria</th>
+                  <th>valor</th>
+                </tr>
+              </thead>
+              <tbody>
+              {receitas.map((item) => (
+                <tr key={item.id}>
+                  <td>{format(item.data, 'dd/MM/yyyy')}</td>
+                  <td>{item.descricao}</td>
+                  <td>{item.categoria}</td>
+                  <td>{item.valor.toLocaleString('pt-BR')}</td>
+                  <td>
+                    <Button variant="danger" onClick={() => excluirReceita(item.id)}>
+                      <FontAwesomeIcon icon={faTrash} />
+                    </Button>
+                    <Button variant="info" onClick={() => abrirTelaAlterarReceita(item.id, item.valor, item.descricao, item.data)}>
+                      <FontAwesomeIcon icon={faPen} />
+                    </Button>
+                  </td>
+                </tr>
+                ))}
+            </tbody>
+            </Table>
+          </div>
+        </div>
+        <div>
+          <Modal scrollable="true" show={mostrarModalAlterar} onHide={fecharModalAlterar}>
+            <Modal.Header closeButton>
+              <Modal.Title>ALTERAR RECEITA</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form>
+              <Form.Group className="mb-1">
                     <Form.Label>Valor</Form.Label>
                     <Form.Control 
                       type="number" 
@@ -238,53 +415,17 @@ function Receitas () {
                       ))}
                     </Form.Select>
                   </Form.Group>
-                </Form>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={fechar}>
-                  CANCELAR
-                </Button>
-                <Button variant="primary" onClick={salvarReceita}>
-                  SALVAR
-                </Button>
-              </Modal.Footer>
-            </Modal>
-          </div>
-          <div className='botoes'>
-              <Button variant="danger" href="/">
+              </Form>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={fecharModalAlterar}>
                 CANCELAR
               </Button>
-              <Button variant="success" onClick={abrirModalCadastrar}>
-                CADASTRAR
+              <Button variant="primary" onClick={alterarReceita}>
+                ALTERAR
               </Button>
-            </div>
-          <div className='tabela-receitas'>
-            <Table size="sm" striped bordered hover>
-              <thead>
-                <tr>
-                  <th>dia</th>
-                  <th>descrição</th>
-                  <th>categoria</th>
-                  <th>valor</th>
-                </tr>
-              </thead>
-              <tbody>
-              {receitas.map((item) => (
-                <tr key={item.id}>
-                  <td>{format(item.data, 'dd/MM/yyyy')}</td>
-                  <td>{item.descricao}</td>
-                  <td>{item.categoria}</td>
-                  <td>{item.valor.toLocaleString('pt-BR')}</td>
-                  <td>
-                    <Button variant="danger" onClick={() => excluirReceita(item.id)}>
-                      X
-                    </Button>
-                  </td>
-                </tr>
-                ))}
-            </tbody>
-            </Table>
-          </div>
+            </Modal.Footer>
+          </Modal>
         </div>
       </div>
   );
