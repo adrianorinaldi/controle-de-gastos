@@ -79,6 +79,7 @@ function CadastroContas() {
     const alterarConta = () => {
       salvarAlteracaoConta();
       setMostrar(false);
+      setFormulario({ ...formulario, 'id': '', descricao: ''});
     };
 
     const salvarAlteracaoConta = async (event) => {

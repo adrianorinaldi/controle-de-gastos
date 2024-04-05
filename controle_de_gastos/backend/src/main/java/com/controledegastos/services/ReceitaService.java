@@ -59,6 +59,7 @@ public class ReceitaService {
             throw new RuntimeException(e);
         }
         receita.setValor(receitaDto.valor());
+        receita.setId(receitaDto.id());
 
         receitaRepository.save(receita);
         return receitaDto;

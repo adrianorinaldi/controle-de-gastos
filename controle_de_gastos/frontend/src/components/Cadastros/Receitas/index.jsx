@@ -16,7 +16,6 @@ function Receitas () {
   const [mostrarModalCadastro, setMostrarModalCadastro] = useState(false);
   const fecharModalCadastro = () => setMostrarModalCadastro(false);
   const [mostrarModalAlterar, setMostrarModalAlterar] = useState(false);
-  const fecharModalAlterar = () => setMostrarModalAlterar(false);
   const [totalReceita, setTotalReceita] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [contas, setContas] = useState([]);
@@ -30,17 +29,14 @@ function Receitas () {
     conta: ''
   });
   const dataAtual = new Date();
-  const dia = String(dataAtual.getDate()).padStart(2, '0');
-  const mes = String(dataAtual.getMonth() + 1).padStart(2, '0');
-  const ano = dataAtual.getFullYear();
-  const data_atual = `${dia}/${mes}/${ano}`
   const [dataSelecionada, setDataSelecionada] = useState(null);
     // Defina o idioma padrão para o DatePicker
     setDefaultLocale(ptBR);
 
   const abrirModalCadastrar = () => {
-    setFormulario({ ...formulario, 'valor': '', 'descricao': '', 'data': ''});
     setMostrarModalCadastro(true);
+    setDataSelecionada(dataAtual);
+    setFormulario({ ...formulario, id: '', valor: '', descricao: '', data: dataAtual});
   };
 
   const pegarValor = async (event) => {
@@ -57,8 +53,8 @@ function Receitas () {
   useEffect(() => {
     buscarTotalReceita();
     buscarTodasReceitas();
-    buscarCategorias();
-    buscarContas();
+    //buscarCategorias();
+    //buscarContas();
   }, []);
 
   const buscarTotalReceita = async (event) => {
@@ -107,10 +103,10 @@ function Receitas () {
   const abrirTelaAlterarReceita = (idReceita, valorReceita, descricaoReceita, dataReceita) => {
     setMostrarModalAlterar(true);
     setDataSelecionada(dataReceita);
-    setFormulario({ ...formulario, 'id': idReceita, 
-                                   'valor': valorReceita, 
-                                   'descricao': descricaoReceita,
-                                   'data': format(dataReceita, 'dd/MM/yyyy')
+    setFormulario({ ...formulario, id: idReceita, 
+                                   valor: valorReceita, 
+                                   descricao: descricaoReceita,
+                                   data: format(dataReceita, 'dd/MM/yyyy')
                                   });
   };
 
@@ -155,6 +151,7 @@ function Receitas () {
   const alterarReceita = () => {
     salvarAlteracaoReceita();
     setMostrarModalAlterar(false);
+    fecharModalAlterar();
   };
 
   const salvarAlteracaoReceita = async (event) => {
@@ -176,6 +173,16 @@ function Receitas () {
     }
   };
 
+  const fecharModalAlterar = () => {
+    setFormulario({ ...formulario, id: '',
+                                   valor: '',
+                                   categoria: '',
+                                   descricao: '',
+                                   data: format(dataAtual.toDateString(), 'dd/MM/yyyy'),
+                                   conta: ''});
+    setMostrarModalAlterar(false);
+  };
+
   
   return (
     <div>
@@ -187,8 +194,9 @@ function Receitas () {
           <Form.Control
             type="text"
             id="receitas"
+            className="text-center"
             aria-describedby="passwordHelpBlock"
-            defaultValue={totalReceita.toLocaleString('pt-BR')}
+            defaultValue={totalReceita}
           />
         </div>
       </div>
@@ -252,7 +260,6 @@ function Receitas () {
                       showIcon
                       toggleCalendarOnIconClick
                       locale="pt-BR"
-                      //defaultValue={data_atual}
                       selected={dataSelecionada}
                       onChange={pegarValorDeData}
                       dateFormat="dd/MM/yyyy" 
@@ -388,7 +395,6 @@ function Receitas () {
                       showIcon
                       toggleCalendarOnIconClick
                       locale="pt-BR"
-                      //defaultValue={data_atual}
                       selected={dataSelecionada}
                       onChange={pegarValorDeData}
                       dateFormat="dd/MM/yyyy" 

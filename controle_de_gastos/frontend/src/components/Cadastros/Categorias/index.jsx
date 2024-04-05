@@ -39,6 +39,7 @@ function Categorias() {
 
   const salvarCategoria = async (event) => {
     event.preventDefault();
+    console.log(formulario);
 
     try {
       const response = await axios.post('http://localhost:8080/categoria/salvar', formulario);
@@ -77,7 +78,7 @@ function Categorias() {
     console.log(formulario);
 
     try {
-      const response = await axios.post('http://localhost:8080/categoria/alterar', formulario);
+      const response = await axios.post('http://localhost:8080/categoria/salvar', formulario);
 
       if (response.status === 201) {
         console.log('Conta Alterada com sucesso!');
@@ -99,6 +100,7 @@ function Categorias() {
   const alterarCategoria = () => {
     salvarAlteracaoCategoria();
     setMostrar(false);
+    setFormulario({ ...formulario, 'id': '', 'descricao': '', 'tipo': ''});
   };
 
   return (
