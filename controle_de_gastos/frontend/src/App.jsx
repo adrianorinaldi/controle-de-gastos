@@ -7,6 +7,7 @@ import CadastroCategorias from './components/Cadastros/Categorias';
 import Inicio from './components/Inicio';
 import Receitas from './components/Cadastros/Receitas';
 import Despesas from './components/Cadastros/Despesas';
+import { ToastContainer } from 'react-toastify';
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,7 @@ function App() {
   return (
     <>
     <RouterProvider router={router}/>
+    <ToastContainer />
     </>
   )
 }

@@ -37,7 +37,7 @@ function despesas () {
   const abrirModalCadastrar = () => {
     setMostrarModalCadastro(true);
     setDataSelecionada(dataAtual);
-    setFormulario({ ...formulario, id: '', valor: '', descricao: '', data: dataAtual});
+    setFormulario({ ...formulario, id: '', valor: '', descricao: '', data: format(dataAtual, 'dd/MM/yyyy')});
   };
 
   const pegarValor = async (event) => {
