@@ -4,6 +4,7 @@ import { React, useState, useEffect } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { toast } from 'react-toastify';
 
 function Categorias() {
   const [mostrar, setMostrar] = useState(false);
@@ -13,6 +14,19 @@ function Categorias() {
     id: '',
     descricao: '',
     tipo: 'R'
+  });
+  const [formularioAlteracao, setFormularioAlteracao] = useState({
+    id: '',
+    descricao: '',
+    tipo: 'R'
+  });
+
+  const [erros, setErros] = useState({
+    descricao: false,
+  });
+
+  const [errosAlteracao, setErrosAlteracao] = useState({
+    descricao_alteracao: false
   });
 
   useEffect(() => {
@@ -24,83 +38,98 @@ function Categorias() {
     setFormulario({ ...formulario, [name]: value });
   };
 
+  const pegarValorAlteracao = (event) => {
+    const { name, value } = event.target;
+    setFormularioAlteracao({ ...formularioAlteracao, [name]: value });
+  };
+
   const buscarTodasCategorias = async (event) => {
-
     try {
-
       const response = await axios.get('http://localhost:8080/categoria/buscar_todas');
-
       setDados(response.data);
-
     } catch (error) {
       console.error('Erro:', error);
+      toast.error("Erro ao tentar buscar todas as categorias!");
     }
   };
 
   const salvarCategoria = async (event) => {
     event.preventDefault();
     console.log(formulario);
-
+    const novoErros = {
+      descricao: formulario.descricao === ''
+    };
+    setErros(novoErros);
+    if (Object.values(novoErros).some(erro => erro)) {
+      return;
+    }
     try {
       const response = await axios.post('http://localhost:8080/categoria/salvar', formulario);
-
       if (response.status === 201) {
         console.log('Categoria Cadastrada com sucesso!');
+        toast.success("Categoria Cadastrada com sucesso!");
         buscarTodasCategorias();
-        
       } else {
         console.error('Erro ao enviar os dados.' + response);
+        toast.error("Erro ao tentar cadastrar!");
       }
     } catch (error) {
       console.error('Erro:', error);
+      toast.error("Erro ao tentar cadastrar!");
     }
   };
 
   const excluirCategoria = async (id) => {
-      
       try {
         const response = await axios.delete(`http://localhost:8080/categoria/deletar/${id}`);
-
         if(response) {
           console.log("excluiu");
+          toast.success("Categoria Excluída com sucesso!");
           buscarTodasCategorias();
         } else {
           console.log("Não excluiu");
+          toast.error("Erro ao tentar excluir!");
         }
       } catch (error) {
         console.error('Erro:', error);
+        toast.error("Erro ao tentar excluir!");
       }
-  };
-
-  const salvarAlteracaoCategoria = async (event) => {
-    //event.preventDefault();
-
-    console.log(formulario);
-
-    try {
-      const response = await axios.post('http://localhost:8080/categoria/salvar', formulario);
-
-      if (response.status === 201) {
-        console.log('Conta Alterada com sucesso!');
-        formulario.descricao = '';
-        buscarTodasCategorias();
-      } else {
-        console.error('Erro ao enviar os dados.' + response);
-      }
-    } catch (error) {
-      console.error('Erro:', error);
-    }
   };
 
   const abrirTelaAlterarCategoria = (idCategoria, descricaoCategoria, tipoCategoria) => {
     setMostrar(true);
-    setFormulario({ ...formulario, 'id': idCategoria, 'descricao': descricaoCategoria, 'tipo': tipoCategoria});
+    setFormularioAlteracao({ ...formularioAlteracao, 'id': idCategoria, 'descricao': descricaoCategoria, 'tipo': tipoCategoria});
   };
 
   const alterarCategoria = () => {
+    const novoErros = {
+      descricao_alteracao: formularioAlteracao.descricao === ''
+    };
+    setErrosAlteracao(novoErros);
+    if (Object.values(novoErros).some(erro => erro)) {
+      return;
+    }
     salvarAlteracaoCategoria();
     setMostrar(false);
-    setFormulario({ ...formulario, 'id': '', 'descricao': '', 'tipo': ''});
+    setFormulario({ ...formularioAlteracao, 'id': '', 'descricao': '', 'tipo': ''});
+  };
+
+  const salvarAlteracaoCategoria = async (event) => {
+    try {
+      const response = await axios.post('http://localhost:8080/categoria/salvar', formularioAlteracao);
+      if (response.status === 201) {
+        console.log('Conta Alterada com sucesso!');
+        toast.success("Categoria Alterada com sucesso!");
+        formularioAlteracao.descricao = '';
+        buscarTodasCategorias();
+      } else {
+        console.error('Erro ao enviar os dados.' + response);
+        toast.error("Erro ao tentar alterar!");
+      }
+    } catch (error) {
+      console.error('Erro:', error);
+      toast.error("Erro ao tentar alterar!");
+    }
   };
 
   return (
@@ -140,7 +169,9 @@ function Categorias() {
                 name="descricao"
                 value={formulario.descricao}
                 onChange={pegarValor}
+                isInvalid={erros.descricao}
                 />
+                <Form.Control.Feedback type="invalid">Campo obrigatório</Form.Control.Feedback>
             </Form.Group>
             <div className='botoes'>
               <Button variant="danger" href="/">
@@ -198,8 +229,8 @@ function Categorias() {
                       id="R"
                       name="tipo"
                       value="R"
-                      onChange={pegarValor}
-                      checked={formulario.tipo == 'R' ? true : false}
+                      onChange={pegarValorAlteracao}
+                      checked={formularioAlteracao.tipo == 'R' ? true : false}
                       />
                     <Form.Check 
                       inline
@@ -208,8 +239,8 @@ function Categorias() {
                       id="D"
                       name="tipo"
                       value="D"
-                      onChange={pegarValor}
-                      checked={formulario.tipo == 'D' ? true : false}
+                      onChange={pegarValorAlteracao}
+                      checked={formularioAlteracao.tipo == 'D' ? true : false}
                       />
                   </div>
                   <br></br>
@@ -218,9 +249,11 @@ function Categorias() {
                     type="text" 
                     placeholder="Digite a descrição da categoria..." 
                     name="descricao"
-                    value={formulario.descricao}
-                    onChange={pegarValor}
+                    value={formularioAlteracao.descricao}
+                    onChange={pegarValorAlteracao}
+                    isInvalid={errosAlteracao.descricao_alteracao}
                     />
+                    <Form.Control.Feedback type="invalid">Campo obrigatório</Form.Control.Feedback>
                 </Form.Group>
               </Form>
             </Modal.Body>

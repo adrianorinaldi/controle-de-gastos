@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { toast } from 'react-toastify';
 import { registerLocale, setDefaultLocale } from 'react-datepicker';
 import ptBR from 'date-fns/locale/pt-BR';
 import { format } from 'date-fns';
@@ -28,21 +29,28 @@ function Receitas () {
     data: '',
     conta: ''
   });
+  const [formularioAlteracao, setFormularioAlteracao] = useState({
+    id: '',
+    valor: '',
+    categoria: '',
+    descricao: '',
+    data: '',
+    conta: ''
+  });
   const dataAtual = new Date();
   const [dataSelecionada, setDataSelecionada] = useState(null);
+  const [dataSelecionadaAlteracao, setDataSelecionadaAlteracao] = useState(null);
     // Defina o idioma padrão para o DatePicker
     setDefaultLocale(ptBR);
-
-  const abrirModalCadastrar = () => {
-    setMostrarModalCadastro(true);
-    setDataSelecionada(dataAtual);
-    setFormulario({ ...formulario, id: '', valor: '', descricao: '', data: format(dataAtual, 'dd/MM/yyyy')});
-  };
 
   const pegarValor = async (event) => {
     const { name, value } = event.target;
     setFormulario({ ...formulario, [name]: value });
-    console.log({...formulario});
+  };
+
+  const pegarValorAlteracao = async (event) => {
+    const { name, value } = event.target;
+    setFormulario({ ...formularioAlteracao, [name]: value });
   };
 
   const pegarValorDeData = (date) => {
@@ -50,140 +58,181 @@ function Receitas () {
     setFormulario({ ...formulario, 'data': format(date, 'dd/MM/yyyy') });
   };
 
+  const pegarValorDeDataAlteracao = (date) => {
+    setDataSelecionada(date);
+    setFormulario({ ...formularioAlteracao, 'data': format(date, 'dd/MM/yyyy') });
+  };
+
+  const [erros, setErros] = useState({
+    valor: false,
+    categoria: false,
+    descricao: false,
+    data: false,
+    conta: false
+  });
+
+  const [errosAlteracao, setErrosAlteracao] = useState({
+    valor: false,
+    categoria: false,
+    descricao: false,
+    data: false,
+    conta: false
+  });
+
   useEffect(() => {
     buscarTotalReceita();
     buscarTodasReceitas();
-    //buscarCategorias();
-    //buscarContas();
   }, []);
+
+  const abrirModalCadastrar = () => {
+    setMostrarModalCadastro(true);
+    setDataSelecionada(dataAtual);
+    setFormulario({ ...formulario, id: '', valor: '', descricao: '', data: format(dataAtual, 'dd/MM/yyyy')});
+  };
 
   const buscarTotalReceita = async (event) => {
     try {
       const response = await axios.get(`http://localhost:8080/receita/buscar_total_receita`);
       setTotalReceita(response.data);
-
     } catch (error) {
       console.error('Erro:', error);
+      toast.error("Erro ao tentar buscar total da receita!");
     }
   } 
 
   const buscarCategorias = async (event) => {
     try {
-
       const response = await axios.get('http://localhost:8080/categoria/buscar_categoria_receitas');
       setCategorias(response.data);
-
     } catch (error) {
       console.error('Erro:', error);
+      toast.error("Erro ao tentar buscar todas as categorias!");
     }
   } 
 
   const buscarContas = async (event) => {
     try {
-
       const response = await axios.get('http://localhost:8080/conta/buscar_todas');
       setContas(response.data);
-
     } catch (error) {
       console.error('Erro:', error);
+      toast.error("Erro ao tentar buscar todas as contas!");
     }
   } 
 
   const buscarTodasReceitas = async (event) => {
     try {
       const response = await axios.get('http://localhost:8080/receita/buscar_todas');
-      console.log(response.data);
       setReceitas(response.data);
       buscarTotalReceita();
     } catch (error) {
       console.error('Erro:', error);
+      toast.error("Erro ao tentar buscar todas as receitas!");
     }
-  };
-
-  const abrirTelaAlterarReceita = (idReceita, valorReceita, descricaoReceita, dataReceita) => {
-    setMostrarModalAlterar(true);
-    setDataSelecionada(dataReceita);
-    setFormulario({ ...formulario, id: idReceita, 
-                                   valor: valorReceita, 
-                                   descricao: descricaoReceita,
-                                   data: format(dataReceita, 'dd/MM/yyyy')
-                                  });
   };
 
   const salvarReceita = async (event) => {
     event.preventDefault();
-
-    console.log(formulario);
-
+    const novoErros = {
+      valor: formulario.valor === '',
+      categoria: formulario.categoria === '',
+      descricao: formulario.descricao === '',
+      data: formulario.data === '',
+      conta: formulario.conta === ''
+    };
+    setErros(novoErros);
+    if (Object.values(novoErros).some(erro => erro)) {
+      return;
+    }
     try {
       const response = await axios.post('http://localhost:8080/receita/salvar', formulario);
-
       if (response.status === 201) {
         console.log('Conta Cadastrada com sucesso!');
+        toast.success("Receita Cadastrada com sucesso!");
         buscarTodasReceitas();
         fecharModalCadastro();
       } else {
         console.error('Erro ao enviar os dados.' + response);
+        toast.error("Erro ao tentar cadastrar receita!");
       }
     } catch (error) {
       console.error('Erro:', error);
+      toast.error("Erro ao tentar cadastrar receita!");
     }
   };
 
   const excluirReceita = async (id) => {
-        
-    console.log("depois="+id);
-
       try {
         const response = await axios.delete(`http://localhost:8080/receita/deletar/${id}`);
-
         if(response) {
           console.log("excluiu");
+          toast.success("Receita Excluída com sucesso!");
           buscarTodasReceitas();
         } else {
           console.log("Não excluiu");
+          toast.error("Erro ao tentar excluir receita!");
         }
       } catch (error) {
         console.error('Erro:', error);
+        toast.error("Erro ao tentar excluir receita!");
       }
   };
 
+  const abrirTelaAlterarReceita = (idReceita, valorReceita, descricaoReceita, dataReceita) => {
+    setMostrarModalAlterar(true);
+    setDataSelecionadaAlteracao(dataReceita);
+    setFormularioAlteracao({ ...formularioAlteracao, id: idReceita, 
+                                                     valor: valorReceita, 
+                                                     descricao: descricaoReceita,
+                                                     data: format(dataReceita, 'dd/MM/yyyy')
+                                                    });
+  };
+
   const alterarReceita = () => {
+    const novoErros = {
+      valor: formularioAlteracao.valor === '',
+      categoria: formularioAlteracao.categoria === '',
+      descricao: formularioAlteracao.descricao === '',
+      data: formularioAlteracao.data === '',
+      conta: formularioAlteracao.conta === ''
+    };
+    setErrosAlteracao(novoErros);
+    if (Object.values(novoErros).some(erro => erro)) {
+      return;
+    }
     salvarAlteracaoReceita();
     setMostrarModalAlterar(false);
     fecharModalAlterar();
   };
 
   const salvarAlteracaoReceita = async (event) => {
-
-    console.log(formulario);
-
     try {
       const response = await axios.post('http://localhost:8080/receita/salvar', formulario);
-
       if (response.status === 201) {
-        console.log('Conta Alterada com sucesso!');
+        console.log('Receita Alterada com sucesso!');
+        toast.success("Receita Alterada com sucesso!");
         formulario.descricao = '';
         buscarTodasReceitas();
       } else {
         console.error('Erro ao enviar os dados.' + response);
+        toast.error("Erro ao tentar alterar receita!");
       }
     } catch (error) {
       console.error('Erro:', error);
+      toast.error("Erro ao tentar alterar receita!");
     }
   };
 
   const fecharModalAlterar = () => {
-    setFormulario({ ...formulario, id: '',
-                                   valor: '',
-                                   categoria: '',
-                                   descricao: '',
-                                   data: format(dataAtual.toDateString(), 'dd/MM/yyyy'),
-                                   conta: ''});
+    setFormularioAlteracao({ ...formularioAlteracao, id: '',
+                                                     valor: '',
+                                                     categoria: '',
+                                                     descricao: '',
+                                                     data: '',
+                                                     conta: ''});
     setMostrarModalAlterar(false);
   };
 
-  
   return (
     <div>
       <div className='receitas'>
@@ -218,8 +267,9 @@ function Receitas () {
                       value={formulario.valor}
                       onChange={pegarValor}
                       className="campo-obrigatorio"
-                      required
+                      isInvalid={erros.valor}
                       />
+                      <Form.Control.Feedback type="invalid">Campo obrigatório</Form.Control.Feedback>
                   </Form.Group>
                   <Form.Group className="mb-1" onClick={buscarCategorias}>
                     <Form.Label>Categoria</Form.Label>
@@ -229,7 +279,7 @@ function Receitas () {
                       onClick={pegarValor}
                       onChange={pegarValor}
                       className="campo-obrigatorio"
-                      required
+                      isInvalid={erros.categoria}
                       >
                       {categorias.map((item) => (
                         <option
@@ -240,6 +290,7 @@ function Receitas () {
                         </option>
                       ))}
                     </Form.Select>
+                    <Form.Control.Feedback type="invalid">Campo obrigatório</Form.Control.Feedback>
                   </Form.Group>
                   <Form.Group className="mb-1">
                     <Form.Label>Descrição</Form.Label>
@@ -250,8 +301,9 @@ function Receitas () {
                       value={formulario.descricao}
                       onChange={pegarValor}
                       className="campo-obrigatorio"
-                      required
+                      isInvalid={erros.descricao}
                       />
+                      <Form.Control.Feedback type="invalid">Campo obrigatório</Form.Control.Feedback>
                   </Form.Group>
                   <Form.Group>
                     <Form.Label>Data</Form.Label>
@@ -265,8 +317,9 @@ function Receitas () {
                       dateFormat="dd/MM/yyyy" 
                       className="form-control campo-obrigatorio" 
                       name="data"
-                      required
+                      isInvalid={erros.data}
                     />
+                    <Form.Control.Feedback type="invalid">Campo obrigatório</Form.Control.Feedback>
                   </Form.Group>
                   <Form.Group className="mb-1" onClick={buscarContas}>
                     <Form.Label>Conta</Form.Label>
@@ -275,6 +328,7 @@ function Receitas () {
                       value={formulario.conta}
                       onClick={pegarValor}
                       onChange={pegarValor}
+                      isInvalid={erros.conta}
                       >
                       {contas.map((item) => (
                         <option 
@@ -285,6 +339,7 @@ function Receitas () {
                         </option>
                       ))}
                     </Form.Select>
+                    <Form.Control.Feedback type="invalid">Campo obrigatório</Form.Control.Feedback>
                   </Form.Group>
                 </Form>
               </Modal.Body>
@@ -350,21 +405,22 @@ function Receitas () {
                       type="number" 
                       placeholder="Digite o valor" 
                       name="valor"
-                      value={formulario.valor}
-                      onChange={pegarValor}
+                      value={formularioAlteracao.valor}
+                      onChange={pegarValorAlteracao}
                       className="campo-obrigatorio"
-                      required
+                      isInvalid={errosAlteracao.valor}
                       />
+                      <Form.Control.Feedback type="invalid">Campo obrigatório</Form.Control.Feedback>
                   </Form.Group>
                   <Form.Group className="mb-1" onClick={buscarCategorias}>
                     <Form.Label>Categoria</Form.Label>
                     <Form.Select 
                       name="categoria"
-                      value={formulario.categoria}
-                      onClick={pegarValor}
-                      onChange={pegarValor}
+                      value={formularioAlteracao.categoria}
+                      onClick={pegarValorAlteracao}
+                      onChange={pegarValorAlteracao}
                       className="campo-obrigatorio"
-                      required
+                      isInvalid={errosAlteracao.categoria}
                       >
                       {categorias.map((item) => (
                         <option 
@@ -375,6 +431,7 @@ function Receitas () {
                         </option>
                       ))}
                     </Form.Select>
+                    <Form.Control.Feedback type="invalid">Campo obrigatório</Form.Control.Feedback>
                   </Form.Group>
                   <Form.Group className="mb-1">
                     <Form.Label>Descrição</Form.Label>
@@ -382,11 +439,12 @@ function Receitas () {
                       type="text" 
                       placeholder="Digite a descrição" 
                       name="descricao"
-                      value={formulario.descricao}
-                      onChange={pegarValor}
+                      value={formularioAlteracao.descricao}
+                      onChange={pegarValorAlteracao}
                       className="campo-obrigatorio"
-                      required
+                      isInvalid={errosAlteracao.descricao}
                       />
+                      <Form.Control.Feedback type="invalid">Campo obrigatório</Form.Control.Feedback>
                   </Form.Group>
                   <Form.Group>
                     <Form.Label>Data</Form.Label>
@@ -395,21 +453,23 @@ function Receitas () {
                       showIcon
                       toggleCalendarOnIconClick
                       locale="pt-BR"
-                      selected={dataSelecionada}
-                      onChange={pegarValorDeData}
+                      selected={dataSelecionadaAlteracao}
+                      onChange={pegarValorDeDataAlteracao}
                       dateFormat="dd/MM/yyyy" 
                       className="form-control campo-obrigatorio" 
                       name="data"
-                      required
+                      isInvalid={errosAlteracao.data}
                     />
+                    <Form.Control.Feedback type="invalid">Campo obrigatório</Form.Control.Feedback>
                   </Form.Group>
                   <Form.Group className="mb-1" onClick={buscarContas}>
                     <Form.Label>Conta</Form.Label>
                     <Form.Select 
                       name="conta"
-                      value={formulario.conta}
-                      onClick={pegarValor}
-                      onChange={pegarValor}
+                      value={formularioAlteracao.conta}
+                      onClick={pegarValorAlteracao}
+                      onChange={pegarValorAlteracao}
+                      isInvalid={errosAlteracao.conta}
                       >
                       {contas.map((item) => (
                         <option 
@@ -420,6 +480,7 @@ function Receitas () {
                         </option>
                       ))}
                     </Form.Select>
+                    <Form.Control.Feedback type="invalid">Campo obrigatório</Form.Control.Feedback>
                   </Form.Group>
               </Form>
             </Modal.Body>

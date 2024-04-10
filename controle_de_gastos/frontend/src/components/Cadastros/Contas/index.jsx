@@ -16,6 +16,10 @@ function CadastroContas() {
     id: '',
     descricao: ''
   });
+  const [formularioAlteracao, setFormularioAlteracao] = useState({
+    id: '',
+    descricao: ''
+  });
 
   useEffect(() => {
     buscarTodasContas();
@@ -26,36 +30,40 @@ function CadastroContas() {
     setFormulario({ ...formulario, [name]: value });
   };
 
+  const pegarValorAlteracao = (event) => {
+    const { name, value } = event.target;
+    setFormularioAlteracao({ ...formularioAlteracao, [name]: value });
+  };
+
+  const [erros, setErros] = useState({
+    descricao: false,
+  });
+
+  const [errosAlteracao, setErrosAlteracao] = useState({
+    descricao_alteracao: false
+  });
+
   const buscarTodasContas = async (event) => {
-
     try {
-
       const response = await axios.get('http://localhost:8080/conta/buscar_todas');
-
       setDados(response.data);
-
     } catch (error) {
       console.error('Erro:', error);
+      toast.error("Erro ao tentar buscar todas as contas!");
     }
   };
 
   const salvarConta = async (event) => {
     event.preventDefault();
-
     const novoErros = {
       descricao: formulario.descricao === ''
     };
-
     setErros(novoErros);
-
-    // Se algum campo estiver vazio, não prosseguir com o salvamento
     if (Object.values(novoErros).some(erro => erro)) {
       return;
     }
-
     try {
       const response = await axios.post('http://localhost:8080/conta/salvar', formulario);
-
       if (response.status === 201) {
         toast.success("Conta Cadastrada com sucesso!",{
           position: "top-right",
@@ -80,10 +88,8 @@ function CadastroContas() {
   };
 
   const excluirConta = async (id) => {
-
     try {
       const response = await axios.delete(`http://localhost:8080/conta/deletar/${id}`);
-
       if (response) {
         console.log("excluiu");
         toast.success("Conta Excluída com sucesso!");
@@ -98,40 +104,31 @@ function CadastroContas() {
     }
   };
 
-  const abrirTelaAlterarConta = (idConta) => {
+  const abrirTelaAlterarConta = (idConta, descricaoConta) => {
     setMostrar(true);
-    setFormulario({ ...formulario, 'id': idConta });
+    setFormularioAlteracao({ ...formularioAlteracao, 'id': idConta, 'descricao': descricaoConta });
   };
 
   const alterarConta = () => {
     const novoErros = {
-      descricao: formulario.descricao === ''
+      descricao_alteracao: formularioAlteracao.descricao === ''
     };
-
-    setErros(novoErros);
-
-    // Se algum campo estiver vazio, não prosseguir com o salvamento
+    setErrosAlteracao(novoErros);
     if (Object.values(novoErros).some(erro => erro)) {
       return;
     }
-    
     salvarAlteracaoConta();
     setMostrar(false);
-    setFormulario({ ...formulario, 'id': '', descricao: '' });
+    setFormularioAlteracao({ ...formularioAlteracao, 'id': '', descricao: '' });
   };
 
   const salvarAlteracaoConta = async (event) => {
-    //event.preventDefault();
-
-    console.log(formulario);
-
     try {
-      const response = await axios.post('http://localhost:8080/conta/alterar', formulario);
-
+      const response = await axios.post('http://localhost:8080/conta/alterar', formularioAlteracao);
       if (response.status === 201) {
         console.log('Conta Alterada com sucesso!');
         toast.success("Conta Alterada com sucesso!");
-        formulario.descricao = '';
+        formularioAlteracao.descricao = '';
         buscarTodasContas();
       } else {
         console.error('Erro ao enviar os dados.' + response);
@@ -142,10 +139,6 @@ function CadastroContas() {
       toast.error("Erro ao tentar alterar!");
     }
   };
-
-  const [erros, setErros] = useState({
-    descricao: false
-  });
 
   return (
     <div>
@@ -166,7 +159,7 @@ function CadastroContas() {
             <Form.Control.Feedback type="invalid">Campo obrigatório</Form.Control.Feedback>
           </Form.Group>
           <div className='botoes'>
-            <Button variant="danger" href="/">
+            <Button variant="danger" href="/inicio">
               CANCELAR
             </Button>
             <Button variant="success" type="submit">
@@ -192,7 +185,7 @@ function CadastroContas() {
                   <Button variant="danger" onClick={() => excluirConta(item.id)}>
                     <FontAwesomeIcon icon={faTrash} />
                   </Button>
-                  <Button variant="info" onClick={() => abrirTelaAlterarConta(item.id)}>
+                  <Button variant="info" onClick={() => abrirTelaAlterarConta(item.id, item.descricao)}>
                     <FontAwesomeIcon icon={faPen} />
                   </Button>
                 </td>
@@ -209,14 +202,14 @@ function CadastroContas() {
           <Modal.Body>
             <Form>
               <Form.Group className="mb-1">
-                <Form.Label>Nova Descrição</Form.Label>
+                <Form.Label>Conta</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Digite a nova descrição da conta..."
                   name="descricao"
-                  value={formulario.descricao}
-                  onChange={pegarValor}
-                  isInvalid={erros.descricao}
+                  value={formularioAlteracao.descricao}
+                  onChange={pegarValorAlteracao}
+                  isInvalid={errosAlteracao.descricao_alteracao}
                 />
                 <Form.Control.Feedback type="invalid">Campo obrigatório</Form.Control.Feedback>
               </Form.Group>
@@ -231,11 +224,6 @@ function CadastroContas() {
             </Button>
           </Modal.Footer>
         </Modal>
-      </div>
-      <div>
-        {/* <Alerta mostrar={mostrarMensagemSucesso} mensagem="teste" />*/}
-        
-       
       </div>
     </div>
   );
