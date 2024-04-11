@@ -71,8 +71,8 @@ public class ReceitaService {
 
         for(Receita receita : receitaRepository.findAll(sortById)) {
             ReceitaDTOResponse receitaDTOResponse = new ReceitaDTOResponse(receita.getId(),receita.getDescricao(),
-                                                   receita.getCategoria().getDescricao(), receita.getData().toString(),
-                                                   receita.getConta().getDescricao(), receita.getValor());
+                                                   receita.getCategoria().getId(), receita.getCategoria().getDescricao(), receita.getData().toString(),
+                                                   receita.getConta().getId(), receita.getConta().getDescricao(), receita.getValor());
             receitasDTOResponse.add(receitaDTOResponse);
         }
         return receitasDTOResponse;

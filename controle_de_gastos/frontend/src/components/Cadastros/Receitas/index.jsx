@@ -50,7 +50,7 @@ function Receitas () {
 
   const pegarValorAlteracao = async (event) => {
     const { name, value } = event.target;
-    setFormulario({ ...formularioAlteracao, [name]: value });
+    setFormularioAlteracao({ ...formularioAlteracao, [name]: value });
   };
 
   const pegarValorDeData = (date) => {
@@ -59,8 +59,8 @@ function Receitas () {
   };
 
   const pegarValorDeDataAlteracao = (date) => {
-    setDataSelecionada(date);
-    setFormulario({ ...formularioAlteracao, 'data': format(date, 'dd/MM/yyyy') });
+    setDataSelecionadaAlteracao(date);
+    setFormularioAlteracao({ ...formularioAlteracao, 'data': format(date, 'dd/MM/yyyy') });
   };
 
   const [erros, setErros] = useState({
@@ -147,7 +147,7 @@ function Receitas () {
     try {
       const response = await axios.post('http://localhost:8080/receita/salvar', formulario);
       if (response.status === 201) {
-        console.log('Conta Cadastrada com sucesso!');
+        console.log('Receita Cadastrada com sucesso!');
         toast.success("Receita Cadastrada com sucesso!");
         buscarTodasReceitas();
         fecharModalCadastro();
@@ -178,13 +178,15 @@ function Receitas () {
       }
   };
 
-  const abrirTelaAlterarReceita = (idReceita, valorReceita, descricaoReceita, dataReceita) => {
+  const abrirTelaAlterarReceita = (idReceita, idCategoria, valorReceita, descricaoReceita, dataReceita, idConta) => {
     setMostrarModalAlterar(true);
     setDataSelecionadaAlteracao(dataReceita);
     setFormularioAlteracao({ ...formularioAlteracao, id: idReceita, 
-                                                     valor: valorReceita, 
+                                                     valor: valorReceita,
+                                                     categoria: idCategoria, 
                                                      descricao: descricaoReceita,
-                                                     data: format(dataReceita, 'dd/MM/yyyy')
+                                                     data: format(dataReceita, 'dd/MM/yyyy'),
+                                                     conta: idConta
                                                     });
   };
 
@@ -201,17 +203,16 @@ function Receitas () {
       return;
     }
     salvarAlteracaoReceita();
-    setMostrarModalAlterar(false);
     fecharModalAlterar();
   };
 
   const salvarAlteracaoReceita = async (event) => {
     try {
-      const response = await axios.post('http://localhost:8080/receita/salvar', formulario);
+      const response = await axios.post('http://localhost:8080/receita/salvar', formularioAlteracao);
       if (response.status === 201) {
         console.log('Receita Alterada com sucesso!');
         toast.success("Receita Alterada com sucesso!");
-        formulario.descricao = '';
+        formularioAlteracao.descricao = '';
         buscarTodasReceitas();
       } else {
         console.error('Erro ao enviar os dados.' + response);
@@ -266,7 +267,6 @@ function Receitas () {
                       name="valor"
                       value={formulario.valor}
                       onChange={pegarValor}
-                      className="campo-obrigatorio"
                       isInvalid={erros.valor}
                       />
                       <Form.Control.Feedback type="invalid">Campo obrigatório</Form.Control.Feedback>
@@ -278,7 +278,6 @@ function Receitas () {
                       value={formulario.categoria}
                       onClick={pegarValor}
                       onChange={pegarValor}
-                      className="campo-obrigatorio"
                       isInvalid={erros.categoria}
                       >
                       {categorias.map((item) => (
@@ -300,7 +299,6 @@ function Receitas () {
                       name="descricao"
                       value={formulario.descricao}
                       onChange={pegarValor}
-                      className="campo-obrigatorio"
                       isInvalid={erros.descricao}
                       />
                       <Form.Control.Feedback type="invalid">Campo obrigatório</Form.Control.Feedback>
@@ -315,7 +313,7 @@ function Receitas () {
                       selected={dataSelecionada}
                       onChange={pegarValorDeData}
                       dateFormat="dd/MM/yyyy" 
-                      className="form-control campo-obrigatorio" 
+                      className="form-control" 
                       name="data"
                       isInvalid={erros.data}
                     />
@@ -368,6 +366,7 @@ function Receitas () {
                   <th>dia</th>
                   <th>descrição</th>
                   <th>categoria</th>
+                  <th>conta</th>
                   <th>valor</th>
                 </tr>
               </thead>
@@ -376,13 +375,16 @@ function Receitas () {
                 <tr key={item.id}>
                   <td>{format(item.data, 'dd/MM/yyyy')}</td>
                   <td>{item.descricao}</td>
+                  <td>{item.idCategoria}</td>
                   <td>{item.categoria}</td>
                   <td>{item.valor.toLocaleString('pt-BR')}</td>
+                  <td>{item.idConta}</td>
+                  <td>{item.conta}</td>
                   <td>
                     <Button variant="danger" onClick={() => excluirReceita(item.id)}>
                       <FontAwesomeIcon icon={faTrash} />
                     </Button>
-                    <Button variant="info" onClick={() => abrirTelaAlterarReceita(item.id, item.valor, item.descricao, item.data)}>
+                    <Button variant="info" onClick={() => abrirTelaAlterarReceita(item.id, item.idConta, item.valor, item.descricao, item.data, item.idConta)}>
                       <FontAwesomeIcon icon={faPen} />
                     </Button>
                   </td>
@@ -407,7 +409,6 @@ function Receitas () {
                       name="valor"
                       value={formularioAlteracao.valor}
                       onChange={pegarValorAlteracao}
-                      className="campo-obrigatorio"
                       isInvalid={errosAlteracao.valor}
                       />
                       <Form.Control.Feedback type="invalid">Campo obrigatório</Form.Control.Feedback>
@@ -419,7 +420,6 @@ function Receitas () {
                       value={formularioAlteracao.categoria}
                       onClick={pegarValorAlteracao}
                       onChange={pegarValorAlteracao}
-                      className="campo-obrigatorio"
                       isInvalid={errosAlteracao.categoria}
                       >
                       {categorias.map((item) => (
@@ -441,7 +441,6 @@ function Receitas () {
                       name="descricao"
                       value={formularioAlteracao.descricao}
                       onChange={pegarValorAlteracao}
-                      className="campo-obrigatorio"
                       isInvalid={errosAlteracao.descricao}
                       />
                       <Form.Control.Feedback type="invalid">Campo obrigatório</Form.Control.Feedback>
@@ -456,7 +455,7 @@ function Receitas () {
                       selected={dataSelecionadaAlteracao}
                       onChange={pegarValorDeDataAlteracao}
                       dateFormat="dd/MM/yyyy" 
-                      className="form-control campo-obrigatorio" 
+                      className="form-control" 
                       name="data"
                       isInvalid={errosAlteracao.data}
                     />

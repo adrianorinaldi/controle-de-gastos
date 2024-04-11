@@ -2,6 +2,7 @@ import { Button, Form, Table } from 'react-bootstrap';
 import './styles.css';
 import axios from 'axios';
 import { React, useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 function Inicio () {
 
